@@ -1,0 +1,3 @@
+build/
+serviceAccountkey.json
+.env
