@@ -4,7 +4,7 @@ import (
 	"log"
 
 	godotenv "github.com/joho/godotenv"
-	"github.com/prcryx/raft-server/common/constants"
+	"github.com/prcryx/raft-server/internal/common/constants"
 )
 
 type EnvConfig struct {

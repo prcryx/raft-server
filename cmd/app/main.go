@@ -7,8 +7,8 @@ import (
 
 	firebase "firebase.google.com/go"
 	"github.com/prcryx/raft-server/cmd/routes"
-	e "github.com/prcryx/raft-server/common/err"
 	config "github.com/prcryx/raft-server/config"
+	e "github.com/prcryx/raft-server/internal/common/err"
 	"github.com/prcryx/raft-server/internal/db"
 )
 
@@ -29,7 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatal(e.FirebaseLoadError)
 	}
-	
+
 	//run the web server
 	runAppConfig := &RunAppConfig{
 		Env:              env,
@@ -39,8 +39,7 @@ func main() {
 }
 
 func runApp(runAppConfig *RunAppConfig) {
-	var middlewares http.Handler
-	rootRoute := routes.Root(middlewares)
+	rootRoute := routes.Root(runAppConfig.FirebaseInstance)
 	routes.MountAll(rootRoute, routes.V1)
 
 	//create server

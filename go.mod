@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	firebase.google.com/go v3.13.0+incompatible
+	github.com/go-chi/cors v1.2.1
 	github.com/joho/godotenv v1.5.1
 )
 

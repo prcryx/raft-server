@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	constants "github.com/prcryx/raft-server/common/constants"
-	e "github.com/prcryx/raft-server/common/err"
+	constants "github.com/prcryx/raft-server/internal/common/constants"
+	e "github.com/prcryx/raft-server/internal/common/err"
 )
 
 func ResponseWithJSONData(w http.ResponseWriter, code int, payload interface{}) {

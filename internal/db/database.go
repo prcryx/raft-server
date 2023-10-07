@@ -7,7 +7,7 @@ import (
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
-	e "github.com/prcryx/raft-server/common/err"
+	e "github.com/prcryx/raft-server/internal/common/err"
 	"github.com/prcryx/raft-server/config"
 	"google.golang.org/api/option"
 )
