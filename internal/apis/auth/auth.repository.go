@@ -7,17 +7,13 @@ import (
 	"github.com/prcryx/raft-server/internal/apis/auth/dto"
 )
 
-type AuthRepository struct {
-	ac      *AuthController
-	authDto *dto.AuthDTO
-}
 
-func (repo *AuthRepository) AuthenticateUser() (*auth.UserRecord, error) {
+func AuthenticateUser(authDto *dto.AuthDTO, ac *AuthController) (*auth.UserRecord, error) {
 	params := (&auth.UserToCreate{}).
-		Email(repo.authDto.Email).
-		Password(repo.authDto.Password)
+		Email(authDto.Email).
+		Password(authDto.Password)
 
-	user, err := repo.ac.AuthClient.CreateUser(context.Background(), params)
+	user, err := ac.AuthClient.CreateUser(context.Background(), params)
 	if err != nil {
 
 		return nil, err
