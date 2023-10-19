@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/prcryx/raft-server/cmd/di/container"
 	"github.com/prcryx/raft-server/config"
+	"github.com/prcryx/raft-server/di/container"
 	"github.com/prcryx/raft-server/internal/domain/valobj"
 )
 

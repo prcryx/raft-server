@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/prcryx/raft-server/cmd/di/container"
+	"github.com/prcryx/raft-server/di/container"
 	"github.com/prcryx/raft-server/internal/application/apis/auth"
 	"github.com/prcryx/raft-server/internal/common/constants/routesconst"
 	"github.com/prcryx/raft-server/internal/common/utils"

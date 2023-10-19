@@ -1,59 +1,71 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
+	// "net/http"
+	"os"
 
-	firebase "firebase.google.com/go"
-	"github.com/prcryx/raft-server/cmd/routes"
 	config "github.com/prcryx/raft-server/config"
-	e "github.com/prcryx/raft-server/internal/common/err"
-	"github.com/prcryx/raft-server/internal/db"
+	"github.com/prcryx/raft-server/di/wire"
+	"github.com/prcryx/raft-server/internal/application/server"
+	"github.com/prcryx/raft-server/internal/common/constants/routesconst"
+	// di "github.com/prcryx/raft-server/cmd/di"
 )
 
-type RunAppConfig struct {
-	FirebaseInstance *firebase.App
-	Env              *config.EnvConfig
-}
-
 func main() {
-	env, err := config.LoadConfig()
-	if err != nil {
-		log.Fatal(err)
+	var exitCode int = 0
+
+	defer func() {
+		if exitCode != 0 {
+			os.Exit(exitCode)
+		}
+	}()
+
+	//load the config
+	config, configError := config.LoadConfig()
+	if configError != nil {
+		log.Printf("Error: %s", configError.Error())
+		exitCode = 1
+		return
 	}
 
-	//initialize firebase
-
-	firebaseInstance, err := db.InitFirebaseApp(env)
-	if err != nil {
-		log.Fatal(e.FirebaseLoadError)
+	//init firebase App
+	firebaseApp, appInitializationError := wire.InitFirebaseApp(config)
+	if appInitializationError != nil {
+		log.Printf("Error: %s", appInitializationError.Error())
+		exitCode = 1
+		return
 	}
 
-	//run the web server
-	runAppConfig := &RunAppConfig{
-		Env:              env,
-		FirebaseInstance: firebaseInstance,
-	}
-	runApp(runAppConfig)
-}
-
-func runApp(runAppConfig *RunAppConfig) {
-	rootRoute := routes.Root(runAppConfig.FirebaseInstance)
-	routes.MountAll(rootRoute, routes.V1)
-
-	//create server
-	srv := http.Server{
-		Handler: rootRoute,
-		Addr:    ":" + runAppConfig.Env.Port,
+	// init authClient
+	authClient, authClientInitializationError := wire.InitFirebaseAuthClient(firebaseApp)
+	if authClientInitializationError != nil {
+		log.Printf("Error: %s", authClientInitializationError.Error())
+		exitCode = 1
+		return
 	}
 
-	fmt.Printf("server is starting on port: %v", runAppConfig.Env.Port)
+	// init controllerRegistry
+	controllerRegistry, controllerRegistryIntializationError := wire.InitializeControllerRegistry(authClient)
+	if controllerRegistryIntializationError != nil {
+		log.Printf("Error: %s", controllerRegistryIntializationError.Error())
+		exitCode = 1
+		return
+	}
 
-	//listen
-	err := srv.ListenAndServe()
-	if err != nil {
-		log.Fatal(err)
+	// init Server
+	srv, serverInitializationError := wire.InitServer(controllerRegistry, config, routesconst.V1)
+	if serverInitializationError != nil {
+		log.Printf("Error: %s", serverInitializationError.Error())
+		exitCode = 1
+		return
+	}
+
+	//start the server
+	srvStartErr := server.StartServer(srv)
+	if srvStartErr != nil {
+		exitCode = 1
+		return
 	}
 
 }

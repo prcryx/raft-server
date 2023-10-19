@@ -33,7 +33,11 @@ Before running the project, make sure you have the following:
    ```sh
    go mod download
    ```
-3. Install Air for live reload:
+4. Install Air for live reload:
    ```sh
-   go mod download
+   go install github.com/cosmtrek/air@latest
+   ```
+5. Install Google's wire for genererating dependency injection codes:
+   ```sh
+   go install github.com/google/wire/cmd/wire@latest
    ```
