@@ -1,4 +1,4 @@
-package db
+package resource_firebase
 
 import (
 	"context"
@@ -6,9 +6,8 @@ import (
 	"path/filepath"
 
 	firebase "firebase.google.com/go"
-	"firebase.google.com/go/auth"
-	e "github.com/prcryx/raft-server/internal/common/err"
 	"github.com/prcryx/raft-server/config"
+	e "github.com/prcryx/raft-server/internal/common/err"
 	"google.golang.org/api/option"
 )
 
@@ -26,13 +25,4 @@ func InitFirebaseApp(env *config.EnvConfig) (*firebase.App, error) {
 		return nil, err
 	}
 	return app, nil
-}
-
-// setup firebase auth
-func SetupFirebaseAuth(app *firebase.App) *auth.Client {
-	auth, err := app.Auth(context.Background())
-	if err != nil {
-		log.Fatal(e.FirebaseLoadError)
-	}
-	return auth
 }
