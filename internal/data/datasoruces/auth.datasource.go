@@ -14,6 +14,8 @@ type AuthDataSource struct {
 	authClient *auth.Client
 }
 
+var _ IAuthDataSource = (*AuthDataSource)(nil)
+
 func NewAuthDataSource(authClient *auth.Client) (*AuthDataSource, error) {
 	return &AuthDataSource{authClient: authClient}, nil
 }

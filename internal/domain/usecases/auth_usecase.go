@@ -13,6 +13,8 @@ type AuthUseCase struct {
 	repo repositories.AuthRepository
 }
 
+var _ IAuthUseCase = (*AuthUseCase)(nil)
+
 func NewAuthUseCase(repo repositories.AuthRepository) *AuthUseCase {
 	return &AuthUseCase{
 		repo: repo,

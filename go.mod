@@ -10,7 +10,12 @@ require (
 	github.com/prcryx/datacheckr v0.0.0-20230828200113-3816c45c1dc9
 )
 
-require golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // indirect
+require (
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // indirect
+	gorm.io/gorm v1.25.5 // indirect
+)
 
 require (
 	cloud.google.com/go v0.110.0 // indirect

@@ -25,6 +25,8 @@ type AuthController struct {
 	authUseCase *usecases.AuthUseCase
 }
 
+var _ IAuthController = (*AuthController)(nil)
+
 func NewAuthController(authUseCase *usecases.AuthUseCase) *AuthController {
 	return &AuthController{
 		authUseCase: authUseCase,
