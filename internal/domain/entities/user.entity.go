@@ -1,8 +1,8 @@
 package entities
 
 type UserEntity struct {
-	UID         string
-	DisplayName string
-	Email       string
-	PhotoUrl    string
+	UserId      uint   `json:"UserId" gorm:"primaryKey; autoIncrement"`
+	FirebaseId  string `json:"FirebaseId"`
+	DisplayName string `json:"DisplayName"`
+	Email       string `json:"Email"`
 }
