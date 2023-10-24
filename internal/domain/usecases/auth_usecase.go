@@ -26,10 +26,10 @@ func (usecase *AuthUseCase) SignUpWithEmailAndPassword(email, password string) (
 	if err != nil {
 		return nil, err
 	}
+	// call postgres here
+
 	return &entities.UserEntity{
-		UID:         userRecord.UID,
-		DisplayName: userRecord.DisplayName,
-		Email:       userRecord.Email,
-		PhotoUrl:    userRecord.PhotoURL,
+		FirebaseId: userRecord.UID,
+		Email:      userRecord.Email,
 	}, nil
 }
