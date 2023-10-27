@@ -29,7 +29,7 @@ func initServer(port int) *types.Server {
 
 // start a server
 func StartServer(server *types.Server) error {
-	fmt.Printf("server is listening on: %v", server.Port)
+	fmt.Printf("server is listening on: %v\n", server.Port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%v", server.Port), server.Router); err != nil {
 		fmt.Printf("Server failed: %v", err)
 		return err
