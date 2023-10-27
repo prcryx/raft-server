@@ -16,9 +16,7 @@ type App struct {
 func NewApp(controllerRegistry *container.ControllerRegistry, envConfig *config.EnvConfig, version string) *App {
 	return &App{
 		ControllerRegistry: controllerRegistry,
-
-		EnvConfig: envConfig,
-
-		Version: valobj.GetAppVersion(version),
+		EnvConfig:          envConfig,
+		Version:            valobj.GetAppVersion(version),
 	}
 }
