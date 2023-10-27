@@ -7,4 +7,6 @@ const (
 const (
 	HealthCheck = "/healthz"
 	SignUp      = "/signup"
+	SendOtp     = "/send-otp"
+	Login   = "/login"
 )
