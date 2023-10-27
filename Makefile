@@ -27,7 +27,7 @@ run: build
 	@echo "\nrunning..."
 	@./build/$(BINARY_NAME)-$(OS)
 
-debug:
+dev:
 	@echo "runnung..."
 	@GOARCH=$(ARCH) GOOS=$(OS) go run cmd/app/main.go
 
