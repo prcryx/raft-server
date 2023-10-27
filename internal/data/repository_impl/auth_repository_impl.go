@@ -1,9 +1,10 @@
 package repository_impl
 
 import (
-	"firebase.google.com/go/auth"
 	"github.com/prcryx/raft-server/internal/data/datasoruces"
+	"github.com/prcryx/raft-server/internal/domain/entities"
 	"github.com/prcryx/raft-server/internal/domain/repositories"
+	"github.com/prcryx/raft-server/internal/domain/types"
 )
 
 type AuthRepositoryImpl struct {
@@ -18,6 +19,10 @@ func NewAuthRepositoryImpl(authDataSrc *datasoruces.AuthDataSource) *AuthReposit
 	}
 }
 
-func (repoImpl *AuthRepositoryImpl) SignUpWithEmailAndPassword(email, password string) (*auth.UserRecord, error) {
-	return repoImpl.authDataSrc.SignUpWithEmailAndPassword(email, password)
+func (repoImpl *AuthRepositoryImpl) SendOtp(otpReq types.OtpReqBody) (*types.OtpResBody, error) {
+	return repoImpl.authDataSrc.SendOtp(otpReq)
+}
+
+func (repoImpl *AuthRepositoryImpl) Login(otpVerificationReq types.OtpVerificationReqBody) (*entities.UserEntity, error) {
+	return repoImpl.authDataSrc.Login(otpVerificationReq)
 }

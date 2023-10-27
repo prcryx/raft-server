@@ -1,9 +1,11 @@
 package repositories
 
 import (
-	"firebase.google.com/go/auth"
+	"github.com/prcryx/raft-server/internal/domain/entities"
+	"github.com/prcryx/raft-server/internal/domain/types"
 )
 
 type AuthRepository interface {
-	SignUpWithEmailAndPassword(string, string) (*auth.UserRecord, error)
+	SendOtp(types.OtpReqBody) (*types.OtpResBody, error)
+	Login(types.OtpVerificationReqBody) (*entities.UserEntity, error)
 }

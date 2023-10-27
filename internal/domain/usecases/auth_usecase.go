@@ -3,10 +3,12 @@ package usecases
 import (
 	"github.com/prcryx/raft-server/internal/domain/entities"
 	"github.com/prcryx/raft-server/internal/domain/repositories"
+	"github.com/prcryx/raft-server/internal/domain/types"
 )
 
 type IAuthUseCase interface {
-	SignUpWithEmailAndPassword(string, string) (*entities.UserEntity, error)
+	SendOtp(types.OtpReqBody) (*types.OtpResBody, error)
+	Login(types.OtpVerificationReqBody) (*entities.UserEntity, error)
 }
 
 type AuthUseCase struct {
@@ -21,15 +23,18 @@ func NewAuthUseCase(repo repositories.AuthRepository) *AuthUseCase {
 	}
 }
 
-func (usecase *AuthUseCase) SignUpWithEmailAndPassword(email, password string) (*entities.UserEntity, error) {
-	userRecord, err := usecase.repo.SignUpWithEmailAndPassword(email, password)
+func (usecase *AuthUseCase) SendOtp(otpReq types.OtpReqBody) (*types.OtpResBody, error) {
+	otpRes, err := usecase.repo.SendOtp(otpReq)
 	if err != nil {
 		return nil, err
 	}
-	// call postgres here
+	return otpRes, nil
+}
 
-	return &entities.UserEntity{
-		FirebaseId: userRecord.UID,
-		Email:      userRecord.Email,
-	}, nil
+func (usecase *AuthUseCase) Login(otpReq types.OtpVerificationReqBody) (*entities.UserEntity, error) {
+	otpVerification, err := usecase.repo.Login(otpReq)
+	if err != nil {
+		return nil, err
+	}
+	return otpVerification, nil
 }

@@ -3,38 +3,36 @@
 package wire
 
 import (
-	firebase "firebase.google.com/go"
-	"firebase.google.com/go/auth"
 	"github.com/google/wire"
 	"github.com/prcryx/raft-server/config"
 	"github.com/prcryx/raft-server/di/container"
 	"github.com/prcryx/raft-server/internal/application/app"
 	"github.com/prcryx/raft-server/internal/application/server"
 	"github.com/prcryx/raft-server/internal/domain/types"
-	rf "github.com/prcryx/raft-server/internal/infrastructure/resource_firebase"
+	"github.com/prcryx/raft-server/internal/infrastructure/postgres"
+	"github.com/prcryx/raft-server/internal/infrastructure/twilio"
+	"gorm.io/gorm"
 )
 
-//init firebase app
-
-func InitFirebaseApp(envConfig *config.EnvConfig) (*firebase.App, error) {
+// init twilio app
+func InitTwilioApp(conf *config.EnvConfig) (*twilio.TwilioApp, error) {
 	wire.Build(
-		rf.InitFirebaseApp,
+		twilio.NewTwilioApp,
 	)
 	return nil, nil
 }
 
-//init auth client
-
-func InitFirebaseAuthClient(app *firebase.App) (*auth.Client, error) {
+// init Database
+func InitDatabase(envConfig *config.EnvConfig) (*gorm.DB, error) {
 	wire.Build(
-		rf.SetupFirebaseAuth,
+		postgres.CreatePostgresDatabase,
 	)
 	return nil, nil
 }
 
 // init ControllerRegistry
 
-func InitializeControllerRegistry(authClient *auth.Client) (*container.ControllerRegistry, error) {
+func InitializeControllerRegistry(db *gorm.DB, twilioApp *twilio.TwilioApp) (*container.ControllerRegistry, error) {
 	wire.Build(
 		container.NewControllerRegistry,
 		DataSourceSet,

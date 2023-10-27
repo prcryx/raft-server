@@ -1,35 +1,52 @@
 package datasoruces
 
 import (
-	"context"
+	"fmt"
 
-	"firebase.google.com/go/auth"
+	"github.com/prcryx/raft-server/internal/domain/entities"
+	"github.com/prcryx/raft-server/internal/domain/types"
+	"github.com/prcryx/raft-server/internal/infrastructure/twilio"
+	"gorm.io/gorm"
 )
 
 type IAuthDataSource interface {
-	SignUpWithEmailAndPassword(string, string) (*auth.UserRecord, error)
+	SendOtp(types.OtpReqBody) (*types.OtpResBody, error)
+	Login(types.OtpVerificationReqBody) (*entities.UserEntity, error)
 }
 
 type AuthDataSource struct {
-	authClient *auth.Client
+	db        *gorm.DB
+	twilioApp *twilio.TwilioApp
 }
 
 var _ IAuthDataSource = (*AuthDataSource)(nil)
 
-func NewAuthDataSource(authClient *auth.Client) (*AuthDataSource, error) {
-	return &AuthDataSource{authClient: authClient}, nil
+func NewAuthDataSource(db *gorm.DB, app *twilio.TwilioApp) (*AuthDataSource, error) {
+	return &AuthDataSource{db: db, twilioApp: app}, nil
 }
 
-func (authDataSoruce *AuthDataSource) SignUpWithEmailAndPassword(email, password string) (*auth.UserRecord, error) {
-	params := (&auth.UserToCreate{}).
-		Email(email).
-		Password(password)
+// send otp
 
-	user, err := authDataSoruce.authClient.CreateUser(context.Background(), params)
-	if err != nil {
-
-		return nil, err
+func (authDataSoruce *AuthDataSource) SendOtp(otpReq types.OtpReqBody) (*types.OtpResBody, error) {
+	verificationResBody, otpErr := authDataSoruce.twilioApp.SendOtp(otpReq)
+	if otpErr != nil {
+		return nil, otpErr
 	}
+	return verificationResBody, nil
+}
 
+// verify and then find or create user
+
+func (authDataSoruce *AuthDataSource) Login(otpVerificationReq types.OtpVerificationReqBody) (*entities.UserEntity, error) {
+	user := new(entities.UserEntity)
+	otpVerificationRes, otpVerificationErr := authDataSoruce.twilioApp.VerifyOtp(otpVerificationReq)
+	if otpVerificationErr != nil {
+		return nil, otpVerificationErr
+	}
+	if otpVerificationRes.VerificationStatus == types.Approved {
+		//find or create user with the given phoneNo from otp verification response
+		// authDataSoruce.db.findOrCreateUser(phoneNo)
+		fmt.Println(otpVerificationRes.PhoneNo)
+	}
 	return user, nil
 }

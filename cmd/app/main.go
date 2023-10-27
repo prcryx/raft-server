@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+
 	// "net/http"
 	"os"
 
@@ -9,7 +10,6 @@ import (
 	"github.com/prcryx/raft-server/di/wire"
 	"github.com/prcryx/raft-server/internal/application/server"
 	"github.com/prcryx/raft-server/internal/common/constants/routesconst"
-	// di "github.com/prcryx/raft-server/cmd/di"
 )
 
 func main() {
@@ -17,6 +17,7 @@ func main() {
 
 	defer func() {
 		if exitCode != 0 {
+			//other clean up code
 			os.Exit(exitCode)
 		}
 	}()
@@ -29,24 +30,23 @@ func main() {
 		return
 	}
 
-	//init firebase App
-	firebaseApp, appInitializationError := wire.InitFirebaseApp(config)
-	if appInitializationError != nil {
-		log.Printf("Error: %s", appInitializationError.Error())
+	//init twilio app
+	twilioApp, twilioInitializeErr := wire.InitTwilioApp(config)
+	if twilioInitializeErr != nil {
+		log.Printf("Error: %s", twilioInitializeErr.Error())
 		exitCode = 1
 		return
 	}
 
-	// init authClient
-	authClient, authClientInitializationError := wire.InitFirebaseAuthClient(firebaseApp)
-	if authClientInitializationError != nil {
-		log.Printf("Error: %s", authClientInitializationError.Error())
+	//init database
+	db, dbInitializeError := wire.InitDatabase(config)
+	if dbInitializeError != nil {
+		log.Printf("Error: %s", dbInitializeError.Error())
 		exitCode = 1
 		return
 	}
-
 	// init controllerRegistry
-	controllerRegistry, controllerRegistryIntializationError := wire.InitializeControllerRegistry(authClient)
+	controllerRegistry, controllerRegistryIntializationError := wire.InitializeControllerRegistry(db, twilioApp)
 	if controllerRegistryIntializationError != nil {
 		log.Printf("Error: %s", controllerRegistryIntializationError.Error())
 		exitCode = 1
@@ -64,6 +64,7 @@ func main() {
 	//start the server
 	srvStartErr := server.StartServer(srv)
 	if srvStartErr != nil {
+		log.Printf("Error: %s", srvStartErr.Error())
 		exitCode = 1
 		return
 	}

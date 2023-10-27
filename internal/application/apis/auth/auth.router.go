@@ -6,5 +6,6 @@ import (
 )
 
 func AuthRouter(router *chi.Mux, ac *AuthController) {
-	router.Post(routesconst.SignUp, ac.SignUpWithEmailAndPassword)
+	router.Post(routesconst.SendOtp, ac.SendOtp)
+	router.Post(routesconst.Login, ac.Login)
 }

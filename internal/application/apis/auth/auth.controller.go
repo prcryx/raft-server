@@ -4,21 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/prcryx/datacheckr"
 	e "github.com/prcryx/raft-server/internal/common/err"
 	utils "github.com/prcryx/raft-server/internal/common/utils"
+	"github.com/prcryx/raft-server/internal/domain/types"
 	"github.com/prcryx/raft-server/internal/domain/usecases"
 )
 
-//Auth DTO
-
-type AuthDTO struct {
-	Email    string
-	Password string
-}
-
 type IAuthController interface {
-	SignUpWithEmailAndPassword(http.ResponseWriter, *http.Request)
+	SendOtp(http.ResponseWriter, *http.Request)
+	Login(http.ResponseWriter, *http.Request)
 }
 
 type AuthController struct {
@@ -33,38 +27,44 @@ func NewAuthController(authUseCase *usecases.AuthUseCase) *AuthController {
 	}
 }
 
-func (ac *AuthController) SignUpWithEmailAndPassword(w http.ResponseWriter, request *http.Request) {
+func (ac *AuthController) SendOtp(w http.ResponseWriter, request *http.Request) {
 
 	//validating request
-	authDTO := new(AuthDTO)
-	err := json.NewDecoder(request.Body).Decode(&authDTO)
+	otpReq := new(types.OtpReqBody)
+	err := json.NewDecoder(request.Body).Decode(&otpReq)
 	if err != nil {
 		utils.ResponseWithError(w, http.StatusBadRequest, e.InvalidBodyRequest)
 		return
 	}
 	//checking the dto
-	if ok := validate(authDTO); !ok {
+	if ok := utils.ValidatePhone(otpReq); !ok {
 		utils.ResponseWithError(w, http.StatusBadRequest, e.InvalidBodyRequest)
 		return
 	}
 
-	userEntity, err := ac.authUseCase.SignUpWithEmailAndPassword(authDTO.Email, authDTO.Password)
+	verificationRes, err := ac.authUseCase.SendOtp(*otpReq)
 	if err != nil {
 		utils.ResponseWithError(w, http.StatusInternalServerError, e.FailedToCreateUser)
 		return
 	}
-	utils.ResponseWithJSONData(w, http.StatusOK, userEntity)
+	utils.ResponseWithJSONData(w, http.StatusOK, verificationRes)
 
 }
 
-func validate(authDto *AuthDTO) bool {
-	validator := datacheckr.NewValidatorInstance()
+func (ac *AuthController) Login(w http.ResponseWriter, request *http.Request) {
+	//validating request
+	otpVerificationReq := new(types.OtpVerificationReqBody)
+	err := json.NewDecoder(request.Body).Decode(&otpVerificationReq)
+	if err != nil {
+		utils.ResponseWithError(w, http.StatusBadRequest, e.InvalidBodyRequest)
+		return
+	}
 
-	//addvalidation rules
-	validator.AddValidationRules(
-		datacheckr.EmailValidation,
-		datacheckr.MinStrLenValidation(5),
-	)
+	verificationRes, err := ac.authUseCase.Login(*otpVerificationReq)
+	if err != nil {
+		utils.ResponseWithError(w, http.StatusInternalServerError, e.FailedToCreateUser)
+		return
+	}
+	utils.ResponseWithJSONData(w, http.StatusOK, verificationRes)
 
-	return validator.Validate(authDto.Email)
 }
