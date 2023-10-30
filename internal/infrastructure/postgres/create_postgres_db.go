@@ -20,6 +20,8 @@ func CreatePostgresDatabase(config *config.EnvConfig) (*gorm.DB, error) {
 	}
 
 	// Get generic database object sql.DB to use its functions
+	//use dbResolver in future!!
+	// db.Use()
 
 	if sqlDB, err := db.DB(); err != nil {
 		return nil, err
