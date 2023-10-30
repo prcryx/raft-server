@@ -28,11 +28,7 @@ func NewAuthDataSource(db *gorm.DB, app *twilio.TwilioApp) (*AuthDataSource, err
 // send otp
 
 func (authDataSoruce *AuthDataSource) SendOtp(otpReq types.OtpReqBody) (*types.OtpResBody, error) {
-	verificationResBody, otpErr := authDataSoruce.twilioApp.SendOtp(otpReq)
-	if otpErr != nil {
-		return nil, otpErr
-	}
-	return verificationResBody, nil
+	return authDataSoruce.twilioApp.SendOtp(otpReq)
 }
 
 // verify and then find or create user

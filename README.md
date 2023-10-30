@@ -4,7 +4,7 @@ This project is a Go backend application that serves as the server-side componen
 
 ## Features
 
-- Authentication using Firebase
+- Authentication using Twilio
 - Logout Operation
 - Post Feed
 - Follow-Followers Mechanism
