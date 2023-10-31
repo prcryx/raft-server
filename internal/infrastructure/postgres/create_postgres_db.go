@@ -12,7 +12,7 @@ import (
 
 func CreatePostgresDatabase(config *config.EnvConfig) (*gorm.DB, error) {
 	//create db instance wuth gorm
-	db, err := gorm.Open(postgres.Open(config.DbUrl), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(config.DB.URL), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {

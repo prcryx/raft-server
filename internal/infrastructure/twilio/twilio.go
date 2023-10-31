@@ -28,9 +28,9 @@ type TwilioApp struct {
 
 func NewTwilioApp(conf *config.EnvConfig) *TwilioApp {
 	appParams := twilioAppParams{
-		accountSid: conf.TwilioAccountSid,
-		authToken:  conf.TwilioAuthToken,
-		verifySid:  conf.TwilioVerifySid,
+		accountSid: conf.Twilio.AccountSid,
+		authToken:  conf.Twilio.AuthToken,
+		verifySid:  conf.Twilio.VerifySid,
 	}
 	client := twilio.NewRestClientWithParams(twilio.ClientParams{
 		Username: appParams.accountSid,
@@ -107,7 +107,6 @@ func (app *TwilioApp) VerifyOtp(otpReqBody types.OtpVerificationReqBody) (*types
 
 	return &types.OtpVerificationResBody{
 		PhoneNo:            fmt.Sprintf("%v", resultData["to"]),
-		CreatedAt:          fmt.Sprintf("%v", resultData["date_created"]),
 		VerificationStatus: types.Status(fmt.Sprintf("%v", resultData["status"])),
 	}, nil
 }

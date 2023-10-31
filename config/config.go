@@ -1,44 +1,66 @@
 package config
 
 import (
-	"log"
-	"sync"
+	"os"
 
-	godotenv "github.com/joho/godotenv"
-	"github.com/prcryx/raft-server/internal/common/constants"
+	"gopkg.in/yaml.v3"
 )
 
-type EnvConfig struct {
-	Host             string
-	Port             string
-	DbUrl            string
-	TwilioAccountSid string
-	TwilioAuthToken  string
-	TwilioVerifySid  string
+type jwtConfig struct {
+	AccessTokenSecret  string `yaml:"accessTokenSecreet"`
+	RefreshTokenSecret string `yaml:"refreshTokenSecret"`
 }
 
-var once sync.Once
+type serverConfig struct {
+	Host string    `yaml:"host"`
+	Port int       `yaml:"port"`
+	JWT  jwtConfig `yaml:"jwt"`
+}
+
+type dbConfig struct {
+	URL string `yaml:"url"`
+}
+
+type twilioConfig struct {
+	AccountSid string `yaml:"accountSid"`
+	AuthToken  string `yaml:"authToken"`
+	VerifySid  string `yaml:"verifySid"`
+}
+
+type EnvConfig struct {
+	Server serverConfig `yaml:"server"`
+	DB     dbConfig     `yaml:"db"`
+	Twilio twilioConfig `yaml:"twilio"`
+}
+
+// var once sync.Once
 
 func LoadConfig() (*EnvConfig, error) {
-	var env *EnvConfig
-	once.Do(func() {
-		godotenv.Load(".env")
-		envMap, err := godotenv.Read()
-		if err != nil {
-			log.Fatal(1)
-		}
-		env = &EnvConfig{
-			Port:             envMap[constants.Port],
-			Host:             envMap[constants.Host],
-			DbUrl:            envMap[constants.DbUrl],
-			TwilioAccountSid: envMap[constants.TwilioAccountSid],
-			TwilioAuthToken:  envMap[constants.TwilioAuthToken],
-			TwilioVerifySid:  envMap[constants.TwilioVerifySid],
-		}
-	})
-	return env, nil
-}
+	conf := new(EnvConfig)
 
-// var ConfigSet =	wire.NewSet(
-// 	LoadConfig,
-// )
+	file, err := os.ReadFile(".env.yaml")
+	if err != nil {
+		return nil, err
+	}
+
+	decodeErr := yaml.Unmarshal(file, conf)
+	if decodeErr != nil {
+		return nil, decodeErr
+	}
+
+	// envMap, err := godotenv.Read()
+	// if err != nil {
+	// 	log.Fatal(1)
+	// }
+	// env = &EnvConfig{
+	// 	Port:             envMap[constants.Port],
+	// 	Host:             envMap[constants.Host],
+	// 	DbUrl:            envMap[constants.DbUrl],
+	// 	TwilioAccountSid: envMap[constants.TwilioAccountSid],
+	// 	TwilioAuthToken:  envMap[constants.TwilioAuthToken],
+	// 	TwilioVerifySid:  envMap[constants.TwilioVerifySid],
+	// 	SecretKey:        envMap[constants.TwilioVerifySid],
+	// }
+
+	return conf, nil
+}

@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/prcryx/raft-server/internal/application/app"
 	"github.com/prcryx/raft-server/internal/application/routes"
@@ -11,11 +10,7 @@ import (
 )
 
 func NewServer(app *app.App) (*types.Server, error) {
-	port, err := strconv.Atoi(app.EnvConfig.Port)
-	if err != nil {
-		return nil, err
-	}
-	server := initServer(port)
+	server := initServer(app.EnvConfig.Server.Port)
 	routes.SetupRoutes(app, server)
 
 	return server, nil
