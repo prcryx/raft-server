@@ -16,6 +16,7 @@ import (
 	"github.com/prcryx/raft-server/internal/data/repository_impl"
 	"github.com/prcryx/raft-server/internal/domain/types"
 	"github.com/prcryx/raft-server/internal/domain/usecases"
+	"github.com/prcryx/raft-server/internal/infrastructure/jwt"
 	"github.com/prcryx/raft-server/internal/infrastructure/postgres"
 	"github.com/prcryx/raft-server/internal/infrastructure/twilio"
 	"gorm.io/gorm"
@@ -38,8 +39,9 @@ func InitDatabase(envConfig *config.EnvConfig) (*gorm.DB, error) {
 	return db, nil
 }
 
-func InitializeControllerRegistry(db *gorm.DB, twilioApp *twilio.TwilioApp) (*container.ControllerRegistry, error) {
-	authDataSource, err := datasoruces.NewAuthDataSource(db, twilioApp)
+func InitializeControllerRegistry(db *gorm.DB, twilioApp *twilio.TwilioApp, conf *config.EnvConfig) (*container.ControllerRegistry, error) {
+	jwtStrategy := jwt.NewJwtStrategy(conf)
+	authDataSource, err := datasoruces.NewAuthDataSource(db, twilioApp, jwtStrategy)
 	if err != nil {
 		return nil, err
 	}

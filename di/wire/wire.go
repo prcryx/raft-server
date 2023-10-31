@@ -32,13 +32,14 @@ func InitDatabase(envConfig *config.EnvConfig) (*gorm.DB, error) {
 
 // init ControllerRegistry
 
-func InitializeControllerRegistry(db *gorm.DB, twilioApp *twilio.TwilioApp) (*container.ControllerRegistry, error) {
+func InitializeControllerRegistry(db *gorm.DB, twilioApp *twilio.TwilioApp, conf *config.EnvConfig) (*container.ControllerRegistry, error) {
 	wire.Build(
 		container.NewControllerRegistry,
 		DataSourceSet,
 		RepositorySet,
 		UseCaseSet,
 		ControllerSet,
+		OtherServices,
 	)
 
 	return nil, nil

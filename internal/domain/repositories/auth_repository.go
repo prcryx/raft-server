@@ -7,5 +7,5 @@ import (
 
 type AuthRepository interface {
 	SendOtp(types.OtpReqBody) (*types.OtpResBody, error)
-	Login(types.OtpVerificationReqBody) (*entities.UserEntity, error)
+	Login(types.OtpVerificationReqBody) (*entities.User, error)
 }

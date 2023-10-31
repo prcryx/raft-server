@@ -8,7 +8,7 @@ import (
 
 type IAuthUseCase interface {
 	SendOtp(types.OtpReqBody) (*types.OtpResBody, error)
-	Login(types.OtpVerificationReqBody) (*entities.UserEntity, error)
+	Login(types.OtpVerificationReqBody) (*entities.User, error)
 }
 
 type AuthUseCase struct {
@@ -31,10 +31,10 @@ func (usecase *AuthUseCase) SendOtp(otpReq types.OtpReqBody) (*types.OtpResBody,
 	return otpRes, nil
 }
 
-func (usecase *AuthUseCase) Login(otpReq types.OtpVerificationReqBody) (*entities.UserEntity, error) {
-	otpVerification, err := usecase.repo.Login(otpReq)
+func (usecase *AuthUseCase) Login(otpReq types.OtpVerificationReqBody) (*entities.User, error) {
+	user, err := usecase.repo.Login(otpReq)
 	if err != nil {
 		return nil, err
 	}
-	return otpVerification, nil
+	return user, nil
 }

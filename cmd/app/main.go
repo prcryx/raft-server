@@ -25,7 +25,7 @@ func main() {
 	//load the config
 	config, configError := config.LoadConfig()
 	if configError != nil {
-		log.Printf("Error: %s", configError.Error())
+		log.Printf("Config Error: %s", configError.Error())
 		exitCode = 1
 		return
 	}
@@ -46,7 +46,7 @@ func main() {
 		return
 	}
 	// init controllerRegistry
-	controllerRegistry, controllerRegistryIntializationError := wire.InitializeControllerRegistry(db, twilioApp)
+	controllerRegistry, controllerRegistryIntializationError := wire.InitializeControllerRegistry(db, twilioApp, config)
 	if controllerRegistryIntializationError != nil {
 		log.Printf("Error: %s", controllerRegistryIntializationError.Error())
 		exitCode = 1

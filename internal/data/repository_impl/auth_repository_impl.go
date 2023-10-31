@@ -23,6 +23,6 @@ func (repoImpl *AuthRepositoryImpl) SendOtp(otpReq types.OtpReqBody) (*types.Otp
 	return repoImpl.authDataSrc.SendOtp(otpReq)
 }
 
-func (repoImpl *AuthRepositoryImpl) Login(otpVerificationReq types.OtpVerificationReqBody) (*entities.UserEntity, error) {
+func (repoImpl *AuthRepositoryImpl) Login(otpVerificationReq types.OtpVerificationReqBody) (*entities.User, error) {
 	return repoImpl.authDataSrc.Login(otpVerificationReq)
 }

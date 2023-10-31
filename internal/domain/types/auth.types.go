@@ -24,7 +24,6 @@ type OtpVerificationReqBody struct {
 }
 type OtpVerificationResBody struct {
 	PhoneNo            string `json:"phoneNo"`
-	CreatedAt          string `json:"date_created"`
 	VerificationStatus Status `json:"status"`
 }
 
