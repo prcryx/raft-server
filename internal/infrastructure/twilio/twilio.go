@@ -3,8 +3,10 @@ package twilio
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/prcryx/raft-server/config"
+	e "github.com/prcryx/raft-server/internal/common/err"
 	"github.com/prcryx/raft-server/internal/domain/types"
 	"github.com/twilio/twilio-go"
 	verify "github.com/twilio/twilio-go/rest/verify/v2"
@@ -17,8 +19,8 @@ type twilioAppParams struct {
 }
 
 type ITwilioApp interface {
-	SendOtp(types.OtpReqBody) (*types.OtpResBody, error)
-	VerifyOtp(types.OtpVerificationReqBody) (*types.OtpVerificationResBody, error)
+	SendOtp(string) (*types.OtpResBody, error)
+	VerifyOtp(string, string) (*types.OtpVerificationResBody, error)
 }
 
 type TwilioApp struct {
@@ -47,11 +49,11 @@ func NewTwilioApp(conf *config.EnvConfig) *TwilioApp {
 
 var _ ITwilioApp = (*TwilioApp)(nil)
 
-func (app *TwilioApp) SendOtp(otpReq types.OtpReqBody) (*types.OtpResBody, error) {
+func (app *TwilioApp) SendOtp(receiver string) (*types.OtpResBody, error) {
 
 	var (
-		verifySid  string = app.params.verifySid
-		receiver   string = fmt.Sprintf("%v%v", otpReq.CountryCode, otpReq.PhoneNo)
+		verifySid string = app.params.verifySid
+
 		resultData map[string]interface{}
 	)
 
@@ -61,17 +63,18 @@ func (app *TwilioApp) SendOtp(otpReq types.OtpReqBody) (*types.OtpResBody, error
 
 	resp, err := app.client.VerifyV2.CreateVerification(verifySid, params)
 	if err != nil {
-		return nil, err
+		log.Printf("\nsend otp failed for %v\n errors: %v\n", receiver, err)
+		return nil, e.OtpServiceFailedException()
 	}
 
 	response, resErr := json.Marshal(*resp)
 	if resErr != nil {
-		return nil, resErr
+		return nil, e.UnexpectedException(e.FailedToMarshal)
 	}
 
 	resultErr := json.Unmarshal(response, &resultData)
 	if resultErr != nil {
-		return nil, resultErr
+		return nil, e.UnexpectedException(e.FailedToUnmarshal)
 	}
 
 	return &types.OtpResBody{
@@ -80,11 +83,9 @@ func (app *TwilioApp) SendOtp(otpReq types.OtpReqBody) (*types.OtpResBody, error
 	}, nil
 }
 
-func (app *TwilioApp) VerifyOtp(otpReqBody types.OtpVerificationReqBody) (*types.OtpVerificationResBody, error) {
+func (app *TwilioApp) VerifyOtp(otp, to string) (*types.OtpVerificationResBody, error) {
 	var (
 		verificationSid string = app.params.verifySid
-		otp             string = otpReqBody.Otp
-		to              string = fmt.Sprintf("%v", otpReqBody.PhoneNo)
 		resultData      map[string]interface{}
 	)
 	params := &verify.CreateVerificationCheckParams{}
@@ -93,16 +94,17 @@ func (app *TwilioApp) VerifyOtp(otpReqBody types.OtpVerificationReqBody) (*types
 
 	resp, err := app.client.VerifyV2.CreateVerificationCheck(verificationSid, params)
 	if err != nil {
-		return nil, err
+		log.Printf("\notp verification failed for %v\n errors: %v\n", to, err)
+		return nil, e.OtpVerificationFailedException()
 	}
 	response, resErr := json.Marshal(*resp)
 	if resErr != nil {
-		return nil, resErr
+		return nil, e.UnexpectedException(e.FailedToMarshal)
 	}
 
 	resultErr := json.Unmarshal(response, &resultData)
 	if resultErr != nil {
-		return nil, resultErr
+		return nil, e.UnexpectedException(e.FailedToUnmarshal)
 	}
 
 	return &types.OtpVerificationResBody{

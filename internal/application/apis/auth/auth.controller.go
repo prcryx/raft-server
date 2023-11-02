@@ -33,18 +33,18 @@ func (ac *AuthController) SendOtp(w http.ResponseWriter, request *http.Request) 
 	otpReq := new(types.OtpReqBody)
 	err := json.NewDecoder(request.Body).Decode(&otpReq)
 	if err != nil {
-		utils.ResponseWithError(w, http.StatusBadRequest, e.InvalidBodyRequest)
+		utils.ResponseWithError(w, http.StatusBadRequest, e.InvalidBodyRequestException().Error())
 		return
 	}
 	//checking the dto
 	if ok := utils.ValidatePhone(otpReq); !ok {
-		utils.ResponseWithError(w, http.StatusBadRequest, e.InvalidBodyRequest)
+		utils.ResponseWithError(w, http.StatusBadRequest, e.InvalidBodyRequestException().Error())
 		return
 	}
 
 	verificationRes, err := ac.authUseCase.SendOtp(*otpReq)
 	if err != nil {
-		utils.ResponseWithError(w, http.StatusInternalServerError, e.FailedToCreateUser)
+		utils.ResponseWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	utils.ResponseWithJSONData(w, http.StatusOK, verificationRes)
@@ -56,13 +56,13 @@ func (ac *AuthController) Login(w http.ResponseWriter, request *http.Request) {
 	otpVerificationReq := new(types.OtpVerificationReqBody)
 	err := json.NewDecoder(request.Body).Decode(&otpVerificationReq)
 	if err != nil {
-		utils.ResponseWithError(w, http.StatusBadRequest, e.InvalidBodyRequest)
+		utils.ResponseWithError(w, http.StatusBadRequest, e.InvalidBodyRequestException().Error())
 		return
 	}
 
 	verificationRes, err := ac.authUseCase.Login(*otpVerificationReq)
 	if err != nil {
-		utils.ResponseWithError(w, http.StatusInternalServerError, e.FailedToCreateUser)
+		utils.ResponseWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	utils.ResponseWithJSONData(w, http.StatusOK, verificationRes)

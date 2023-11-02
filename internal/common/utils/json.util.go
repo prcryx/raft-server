@@ -12,7 +12,7 @@ import (
 func ResponseWithJSONData(w http.ResponseWriter, code int, payload interface{}) {
 	data, err := json.Marshal(payload)
 	if err != nil {
-		log.Printf(e.FailedToMarshal)
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

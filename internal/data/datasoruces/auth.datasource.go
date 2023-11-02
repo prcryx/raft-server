@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	e "github.com/prcryx/raft-server/internal/common/err"
 	"github.com/prcryx/raft-server/internal/domain/entities"
 	"github.com/prcryx/raft-server/internal/domain/types"
 	"github.com/prcryx/raft-server/internal/infrastructure/jwt"
@@ -36,36 +37,38 @@ func NewAuthDataSource(db *gorm.DB, app *twilio.TwilioApp, jwtStrategy *jwt.JwtS
 // send otp
 
 func (authDataSoruce *AuthDataSource) SendOtp(otpReq types.OtpReqBody) (*types.OtpResBody, error) {
-	return authDataSoruce.twilioApp.SendOtp(otpReq)
+	var receiver string = fmt.Sprintf("%v%v", otpReq.CountryCode, otpReq.PhoneNo)
+	return authDataSoruce.twilioApp.SendOtp(receiver)
 }
 
 // verify and then find or create user
 
 func (authDataSoruce *AuthDataSource) Login(otpVerificationReq types.OtpVerificationReqBody) (*entities.User, error) {
 	userEntity := new(entities.UserEntity)
-	otpVerificationRes, otpVerificationErr := authDataSoruce.twilioApp.VerifyOtp(otpVerificationReq)
+
+	otpVerificationRes, otpVerificationErr := authDataSoruce.twilioApp.VerifyOtp(otpVerificationReq.Otp, otpVerificationReq.PhoneNo)
 	if otpVerificationErr != nil {
 		return nil, otpVerificationErr
 	}
-	if otpVerificationRes.VerificationStatus == types.Approved {
-		//find or create user with the given phoneNo from otp verification response
-		var err error
-		userEntity, err = authDataSoruce.findOrCreateUser(otpVerificationRes.PhoneNo)
-		if err != nil {
-			return nil, err
-		}
-		
-		// we need to generate the access and refresh token
-		user := new(entities.User)
-		accessToken := authDataSoruce.jwtStrategy.GenerateToken(userEntity.UID, userEntity.PhoneNo)
-		fmt.Println("AccessToken:", accessToken)
-		user = userEntity.ToUser(accessToken)
-		fmt.Println(user)
-		return user, nil
-		// return nil, errors.New("user does not exists")
+	if otpVerificationRes.VerificationStatus != types.Approved {
+		// if verification canceled
+		return nil, e.UnauthorizedException()
 	}
-	// if verification canceled
-	return nil, errors.New("login failed")
+	//find or create user with the given phoneNo from otp verification response
+	var err error
+	userEntity, err = authDataSoruce.findOrCreateUser(otpVerificationRes.PhoneNo)
+	if err != nil {
+		return nil, err
+	}
+
+	// we need to generate the access and refresh token
+	user := new(entities.User)
+	accessToken := authDataSoruce.jwtStrategy.GenerateToken(userEntity.UID, userEntity.PhoneNo)
+	fmt.Println("AccessToken:", accessToken)
+	user = userEntity.ToUser(accessToken)
+	fmt.Println(user)
+	return user, nil
+
 }
 
 //get exisiting user or create new user
@@ -78,19 +81,22 @@ func (authDataSource *AuthDataSource) findOrCreateUser(phoneNo string) (*entitie
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// user does not exist
 			log.Printf("%v does not exists", phoneNo)
+
+			//create user
+
 			user = entities.UserEntity{
 				PhoneNo: phoneNo,
 			}
 			if err := authDataSource.db.Create(&user).Error; err != nil {
 				// An error occurred while creating the user
-				log.Printf("error occurred while creating user with : %v ", phoneNo)
-
-				return nil, fmt.Errorf("error occurred while creating user with : %v ", phoneNo)
+				log.Printf("\nuser creation failed %v\n errors: %v\n", phoneNo, err)
+				return nil, e.UserCreationFailedException()
 			}
 			return &user, nil
 		} else {
 			// errors other than not found error
-			return nil, err
+			log.Printf("\ncorrupted data for %v\n errors: %v\n", phoneNo, err)
+			return nil, e.CourruptedUserDataException()
 		}
 	}
 

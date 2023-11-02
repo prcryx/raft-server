@@ -1,9 +1,11 @@
 package err
 
 const (
-	UnableToLoadServiceJson string = "Unable to load serviceAccountKeys.json file"
-	FirebaseLoadError       string = "Firebase load error"
-	FailedToMarshal         string = "Failed to marshal"
-	InvalidBodyRequest      string = "Invalid request body"
-	FailedToCreateUser      string = "Failed to create user"
+	unexpectedError    string = "unexpected error occurred"
+	invalidBodyRequest    string = "invalid request body"
+	otpServiceFailed      string = "otp service failed"
+	otpVerificationFailed string = "otp verification failed"
+	failedToCreateUser    string = "failed to create user"
+	unauthorized          string = "unauthorized"
+	courruptedUserData    string = "corrupted user data"
 )
