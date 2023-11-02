@@ -1,3 +1,5 @@
+//go:build test
+
 package jwt
 
 import "testing"
