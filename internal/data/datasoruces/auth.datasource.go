@@ -90,13 +90,13 @@ func (authDataSource *AuthDataSource) findOrCreateUser(phoneNo string) (*entitie
 			if err := authDataSource.db.Create(&user).Error; err != nil {
 				// An error occurred while creating the user
 				log.Printf("\nuser creation failed %v\n errors: %v\n", phoneNo, err)
-				return nil, e.UserCreationFailedException()
+				return nil, e.InternalServerError()
 			}
 			return &user, nil
 		} else {
 			// errors other than not found error
 			log.Printf("\ncorrupted data for %v\n errors: %v\n", phoneNo, err)
-			return nil, e.CourruptedUserDataException()
+			return nil, e.InternalServerError()
 		}
 	}
 

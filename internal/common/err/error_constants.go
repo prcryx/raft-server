@@ -1,7 +1,8 @@
 package err
 
 const (
-	unexpectedError    string = "unexpected error occurred"
+	unexpectedError       string = "unexpected error occurred"
+	internalServerError   string = "internal server error"
 	invalidBodyRequest    string = "invalid request body"
 	otpServiceFailed      string = "otp service failed"
 	otpVerificationFailed string = "otp verification failed"

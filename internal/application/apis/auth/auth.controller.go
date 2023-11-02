@@ -44,6 +44,10 @@ func (ac *AuthController) SendOtp(w http.ResponseWriter, request *http.Request) 
 
 	verificationRes, err := ac.authUseCase.SendOtp(*otpReq)
 	if err != nil {
+		if appErr, ok := err.(e.AppError); ok {
+			utils.ResponseWithError(w, appErr.GetCode(), appErr.Error())
+			return
+		}
 		utils.ResponseWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -62,6 +66,10 @@ func (ac *AuthController) Login(w http.ResponseWriter, request *http.Request) {
 
 	verificationRes, err := ac.authUseCase.Login(*otpVerificationReq)
 	if err != nil {
+		if appErr, ok := err.(e.AppError); ok {
+			utils.ResponseWithError(w, appErr.GetCode(), appErr.Error())
+			return
+		}
 		utils.ResponseWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

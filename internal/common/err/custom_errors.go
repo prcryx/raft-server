@@ -1,32 +1,32 @@
 package err
 
 import (
-	"errors"
-	"fmt"
+	"net/http"
 )
 
-func UnexpectedException(code DebugErrorCode) error {
-	return fmt.Errorf("%v code: %v", unexpectedError, code)
+func InternalServerError() AppError {
+	return newAppError(http.StatusInternalServerError, internalServerError)
 }
 
-func OtpServiceFailedException() error {
-	return errors.New(otpServiceFailed)
-}
-func OtpVerificationFailedException() error {
-	return errors.New(otpVerificationFailed)
+func UnauthorizedException() AppError {
+	return newAppError(http.StatusUnauthorized, unauthorized)
 }
 
-func UnauthorizedException() error {
-	return errors.New(unauthorized)
+func InvalidBodyRequestException() AppError {
+	return newAppError(http.StatusBadRequest, invalidBodyRequest)
 }
 
-func UserCreationFailedException() error {
-	return errors.New(failedToCreateUser)
-}
+// func OtpServiceFailedException() error {
+// 	return errors.New(otpServiceFailed)
+// }
+// func OtpVerificationFailedException() error {
+// 	return errors.New(otpVerificationFailed)
+// }
 
-func CourruptedUserDataException() error {
-	return errors.New(courruptedUserData)
-}
-func InvalidBodyRequestException() error {
-	return errors.New(invalidBodyRequest)
-}
+// func UserCreationFailedException() error {
+// 	return errors.New(failedToCreateUser)
+// }
+
+// func CourruptedUserDataException() error {
+// 	return errors.New(courruptedUserData)
+// }

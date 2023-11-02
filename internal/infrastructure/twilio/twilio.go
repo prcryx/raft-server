@@ -64,17 +64,18 @@ func (app *TwilioApp) SendOtp(receiver string) (*types.OtpResBody, error) {
 	resp, err := app.client.VerifyV2.CreateVerification(verifySid, params)
 	if err != nil {
 		log.Printf("\nsend otp failed for %v\n errors: %v\n", receiver, err)
-		return nil, e.OtpServiceFailedException()
+		return nil, e.InternalServerError()
 	}
 
 	response, resErr := json.Marshal(*resp)
 	if resErr != nil {
-		return nil, e.UnexpectedException(e.FailedToMarshal)
+		log.Printf("\nmarshaling failed\n errors: %v\n", resErr)
+		return nil, e.InternalServerError()
 	}
 
 	resultErr := json.Unmarshal(response, &resultData)
 	if resultErr != nil {
-		return nil, e.UnexpectedException(e.FailedToUnmarshal)
+		return nil, e.InternalServerError()
 	}
 
 	return &types.OtpResBody{
@@ -95,16 +96,16 @@ func (app *TwilioApp) VerifyOtp(otp, to string) (*types.OtpVerificationResBody, 
 	resp, err := app.client.VerifyV2.CreateVerificationCheck(verificationSid, params)
 	if err != nil {
 		log.Printf("\notp verification failed for %v\n errors: %v\n", to, err)
-		return nil, e.OtpVerificationFailedException()
+		return nil, e.UnauthorizedException()
 	}
 	response, resErr := json.Marshal(*resp)
 	if resErr != nil {
-		return nil, e.UnexpectedException(e.FailedToMarshal)
+		return nil, e.InternalServerError()
 	}
 
 	resultErr := json.Unmarshal(response, &resultData)
 	if resultErr != nil {
-		return nil, e.UnexpectedException(e.FailedToUnmarshal)
+		return nil, e.InternalServerError()
 	}
 
 	return &types.OtpVerificationResBody{

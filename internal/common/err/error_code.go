@@ -4,10 +4,10 @@ package err
 // signature: 55XY
 // descp: 4 <= X <= 9 and Y = m%2 == 1
 
-type DebugErrorCode int
+type LogErrorCode int
 
 const (
-	FailedToMarshal   DebugErrorCode = 5541
-	FailedToUnmarshal DebugErrorCode = 5543
-	NotMatched        DebugErrorCode = 5545
+	FailedToMarshal   LogErrorCode = 5541
+	FailedToUnmarshal LogErrorCode = 5543
+	NotMatched        LogErrorCode = 5545
 )
