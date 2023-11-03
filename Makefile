@@ -13,7 +13,7 @@ gen:
 	@echo "generating wire_gen.go..."
 	@wire ./...
 dry:
-	@echo "building..."
+	@echo "running..."
 	@go run cmd/app/main.go
 
 clean:
