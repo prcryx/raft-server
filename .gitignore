@@ -2,3 +2,4 @@ build/
 serviceAccountkey.json
 .env
 .env.yaml
+tmp/
