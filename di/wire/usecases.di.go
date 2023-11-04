@@ -13,10 +13,18 @@ var (
 			new(*usecases.AuthUseCase),
 		),
 	)
+	FeedUseCaseSet = wire.NewSet(
+		usecases.NewFeedUseCase,
+		wire.Bind(
+			new(usecases.IFeedUseCase),
+			new(*usecases.FeedUseCase),
+		),
+	)
 )
 
 var (
 	UseCaseSet = wire.NewSet(
 		AuthUseCaseSet,
+		FeedUseCaseSet,
 	)
 )
