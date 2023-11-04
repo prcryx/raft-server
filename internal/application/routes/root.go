@@ -13,10 +13,11 @@ import (
 	// "github.com/prcryx/raft-server/internal/apis/auth"
 )
 
-func SetupRoutes(app *app.App, server *types.Server){
+func SetupRoutes(app *app.App, server *types.Server) {
 	root := chi.NewRouter()
 	root.Use(middlewares.Cors())
 	root.Use(middlewares.Logger)
-	MountAll(root, app.Version, app.ControllerRegistry)
+	MountAll(root, app.Version, app.ControllerRegistry, app.ServicesRegistry)
+	// MountAll(root, app.Version, app.ControllerRegistry)
 	server.Router = root
 }

@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	JwtStrategy = wire.NewSet(
+	JwtStrategySet = wire.NewSet(
 		jwt.NewJwtStrategy,
 		wire.Bind(
 			new(jwt.IJwtStrategy),
@@ -16,7 +16,7 @@ var (
 )
 
 var (
-	OtherServices = wire.NewSet(
-		JwtStrategy,
+	OtherServicesSet = wire.NewSet(
+		JwtStrategySet,
 	)
 )

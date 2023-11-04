@@ -5,7 +5,7 @@ import (
 	"github.com/prcryx/raft-server/internal/common/constants/routesconst"
 )
 
-func AuthRouter(router *chi.Mux, ac *AuthController) {
-	router.Post(routesconst.SendOtp, ac.SendOtp)
-	router.Post(routesconst.Login, ac.Login)
+func AuthRouter(router chi.Router, ac IAuthController) {
+		router.Post(routesconst.SendOtp, ac.SendOtp)
+		router.Post(routesconst.Login, ac.Login)
 }

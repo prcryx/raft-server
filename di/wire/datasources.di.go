@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	AuthDataSourceTest = wire.NewSet(
+	AuthDataSourceSet = wire.NewSet(
 		datasoruces.NewAuthDataSource,
 		wire.Bind(
 			new(datasoruces.IAuthDataSource),
@@ -17,6 +17,6 @@ var (
 
 var (
 	DataSourceSet = wire.NewSet(
-		AuthDataSourceTest,
+		AuthDataSourceSet,
 	)
 )

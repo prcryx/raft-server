@@ -3,6 +3,7 @@ package wire
 import (
 	"github.com/google/wire"
 	"github.com/prcryx/raft-server/internal/application/apis/auth"
+	feed "github.com/prcryx/raft-server/internal/application/apis/feeds"
 )
 
 var (
@@ -13,10 +14,19 @@ var (
 			new(*auth.AuthController),
 		),
 	)
+
+	FeedControllerSet = wire.NewSet(
+		feed.NewFeedController,
+		wire.Bind(
+			new(feed.IFeedController),
+			new(*feed.FeedController),
+		),
+	)
 )
 
 var (
 	ControllerSet = wire.NewSet(
 		AuthControllerSet,
+		FeedControllerSet,
 	)
 )

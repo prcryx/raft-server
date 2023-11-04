@@ -30,16 +30,31 @@ func InitDatabase(envConfig *config.EnvConfig) (*gorm.DB, error) {
 	return nil, nil
 }
 
+// init ServicesRegistry
+func InitServicesRegistry(conf *config.EnvConfig) (*container.ServicesRegistry, error) {
+	wire.Build(
+		container.NewServicesRegistry,
+		OtherServicesSet,
+	)
+	return nil, nil
+}
+
 // init ControllerRegistry
 
-func InitializeControllerRegistry(db *gorm.DB, twilioApp *twilio.TwilioApp, conf *config.EnvConfig) (*container.ControllerRegistry, error) {
+func InitializeControllerRegistry(
+	db *gorm.DB,
+	twilioApp twilio.ITwilioApp,
+	conf *config.EnvConfig,
+	// jwtService jwt.IJwtStrategy,
+	serviceRegistry *container.ServicesRegistry,
+) (*container.ControllerRegistry, error) {
 	wire.Build(
 		container.NewControllerRegistry,
 		DataSourceSet,
 		RepositorySet,
 		UseCaseSet,
 		ControllerSet,
-		OtherServices,
+		container.GetJwtService,
 	)
 
 	return nil, nil
@@ -47,7 +62,7 @@ func InitializeControllerRegistry(db *gorm.DB, twilioApp *twilio.TwilioApp, conf
 
 //Intialize Server
 
-func InitServer(controllerRegistry *container.ControllerRegistry, configVars *config.EnvConfig, version string) (*types.Server, error) {
+func InitServer(controllerRegistry *container.ControllerRegistry, servicesRegistry *container.ServicesRegistry, configVars *config.EnvConfig, version string) (*types.Server, error) {
 	wire.Build(
 		server.NewServer,
 		app.NewApp,

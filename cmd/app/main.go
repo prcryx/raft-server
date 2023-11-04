@@ -45,8 +45,15 @@ func main() {
 		exitCode = 1
 		return
 	}
-	// init controllerRegistry
-	controllerRegistry, controllerRegistryIntializationError := wire.InitializeControllerRegistry(db, twilioApp, config)
+	// init SevicesRegistry
+	servicesRegistry, servicesRegistryIntializationError := wire.InitServicesRegistry(config)
+	if servicesRegistryIntializationError != nil {
+		log.Printf("Error: %s", servicesRegistryIntializationError.Error())
+		exitCode = 1
+		return
+	}
+	// init ControllerRegistry
+	controllerRegistry, controllerRegistryIntializationError := wire.InitializeControllerRegistry(db, twilioApp, config, servicesRegistry)
 	if controllerRegistryIntializationError != nil {
 		log.Printf("Error: %s", controllerRegistryIntializationError.Error())
 		exitCode = 1
@@ -54,7 +61,7 @@ func main() {
 	}
 
 	// init Server
-	srv, serverInitializationError := wire.InitServer(controllerRegistry, config, routesconst.V1)
+	srv, serverInitializationError := wire.InitServer(controllerRegistry, servicesRegistry, config, routesconst.V1)
 	if serverInitializationError != nil {
 		log.Printf("Error: %s", serverInitializationError.Error())
 		exitCode = 1

@@ -8,14 +8,15 @@ import (
 
 type App struct {
 	ControllerRegistry *container.ControllerRegistry
-
-	EnvConfig *config.EnvConfig
-	Version   valobj.AppVersion
+	ServicesRegistry   *container.ServicesRegistry
+	EnvConfig          *config.EnvConfig
+	Version            valobj.AppVersion
 }
 
-func NewApp(controllerRegistry *container.ControllerRegistry, envConfig *config.EnvConfig, version string) *App {
+func NewApp(controllerRegistry *container.ControllerRegistry, servicesRegistry *container.ServicesRegistry, envConfig *config.EnvConfig, version string) *App {
 	return &App{
 		ControllerRegistry: controllerRegistry,
+		ServicesRegistry:   servicesRegistry,
 		EnvConfig:          envConfig,
 		Version:            valobj.GetAppVersion(version),
 	}

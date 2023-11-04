@@ -10,6 +10,7 @@ import (
 	"github.com/prcryx/raft-server/config"
 	"github.com/prcryx/raft-server/di/container"
 	"github.com/prcryx/raft-server/internal/application/apis/auth"
+	"github.com/prcryx/raft-server/internal/application/apis/feeds"
 	"github.com/prcryx/raft-server/internal/application/app"
 	"github.com/prcryx/raft-server/internal/application/server"
 	"github.com/prcryx/raft-server/internal/data/datasoruces"
@@ -39,21 +40,30 @@ func InitDatabase(envConfig *config.EnvConfig) (*gorm.DB, error) {
 	return db, nil
 }
 
-func InitializeControllerRegistry(db *gorm.DB, twilioApp *twilio.TwilioApp, conf *config.EnvConfig) (*container.ControllerRegistry, error) {
+// init ServicesRegistry
+func InitServicesRegistry(conf *config.EnvConfig) (*container.ServicesRegistry, error) {
 	jwtStrategy := jwt.NewJwtStrategy(conf)
-	authDataSource, err := datasoruces.NewAuthDataSource(db, twilioApp, jwtStrategy)
+	servicesRegistry := container.NewServicesRegistry(jwtStrategy)
+	return servicesRegistry, nil
+}
+
+func InitializeControllerRegistry(db *gorm.DB, twilioApp twilio.ITwilioApp, conf *config.EnvConfig, serviceRegistry *container.ServicesRegistry) (*container.ControllerRegistry, error) {
+	iJwtStrategy := container.GetJwtService(serviceRegistry)
+	authDataSource, err := datasoruces.NewAuthDataSource(db, twilioApp, iJwtStrategy)
 	if err != nil {
 		return nil, err
 	}
 	authRepositoryImpl := repository_impl.NewAuthRepositoryImpl(authDataSource)
 	authUseCase := usecases.NewAuthUseCase(authRepositoryImpl)
 	authController := auth.NewAuthController(authUseCase)
-	controllerRegistry := container.NewControllerRegistry(authController)
+	feedUseCase := usecases.NewFeedUseCase()
+	feedController := feed.NewFeedController(feedUseCase)
+	controllerRegistry := container.NewControllerRegistry(authController, feedController)
 	return controllerRegistry, nil
 }
 
-func InitServer(controllerRegistry *container.ControllerRegistry, configVars *config.EnvConfig, version string) (*types.Server, error) {
-	appApp := app.NewApp(controllerRegistry, configVars, version)
+func InitServer(controllerRegistry *container.ControllerRegistry, servicesRegistry *container.ServicesRegistry, configVars *config.EnvConfig, version string) (*types.Server, error) {
+	appApp := app.NewApp(controllerRegistry, servicesRegistry, configVars, version)
 	typesServer, err := server.NewServer(appApp)
 	if err != nil {
 		return nil, err
