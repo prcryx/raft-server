@@ -13,7 +13,7 @@ import (
 	"github.com/prcryx/raft-server/internal/domain/valobj"
 )
 
-func MountAll(root chi.Router, version valobj.AppVersion, controllerRegistry *container.ControllerRegistry, serviceRegistry *container.ServicesRegistry) {
+func MountAll(root chi.Router, version valobj.AppVersion, controllerRegistry *container.ControllerRegistry) {
 	// func MountAll(root chi.Router, version valobj.AppVersion, controllerRegistry *container.ControllerRegistry) {
 	router := chi.NewRouter()
 
@@ -24,7 +24,7 @@ func MountAll(root chi.Router, version valobj.AppVersion, controllerRegistry *co
 	auth.AuthRouter(router, controllerRegistry.AuthController)
 
 	router.Group(func(r chi.Router) {
-		r.Use(middlewares.AuthMiddleWare(serviceRegistry.JwtStrategy))
+		r.Use(middlewares.AuthMiddleWare)
 		feed.FeedRouter(r, controllerRegistry.FeedController)
 	})
 

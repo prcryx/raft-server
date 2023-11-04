@@ -17,7 +17,7 @@ func SetupRoutes(app *app.App, server *types.Server) {
 	root := chi.NewRouter()
 	root.Use(middlewares.Cors())
 	root.Use(middlewares.Logger)
-	MountAll(root, app.Version, app.ControllerRegistry, app.ServicesRegistry)
+	MountAll(root, app.Version, app.ControllerRegistry,)
 	// MountAll(root, app.Version, app.ControllerRegistry)
 	server.Router = root
 }

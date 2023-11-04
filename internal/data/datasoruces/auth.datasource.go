@@ -20,13 +20,13 @@ type IAuthDataSource interface {
 
 type AuthDataSource struct {
 	db          *gorm.DB
-	twilioApp   twilio.ITwilioApp
-	jwtStrategy jwt.IJwtStrategy
+	twilioApp   *twilio.TwilioApp
+	jwtStrategy *jwt.JwtStrategy
 }
 
 var _ IAuthDataSource = (*AuthDataSource)(nil)
 
-func NewAuthDataSource(db *gorm.DB, app twilio.ITwilioApp, jwtStrategy jwt.IJwtStrategy) (*AuthDataSource, error) {
+func NewAuthDataSource(db *gorm.DB, app *twilio.TwilioApp, jwtStrategy *jwt.JwtStrategy) (*AuthDataSource, error) {
 	return &AuthDataSource{
 		db:          db,
 		twilioApp:   app,

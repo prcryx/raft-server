@@ -40,16 +40,9 @@ func InitDatabase(envConfig *config.EnvConfig) (*gorm.DB, error) {
 	return db, nil
 }
 
-// init ServicesRegistry
-func InitServicesRegistry(conf *config.EnvConfig) (*container.ServicesRegistry, error) {
+func InitializeControllerRegistry(db *gorm.DB, twilioApp *twilio.TwilioApp, conf *config.EnvConfig) (*container.ControllerRegistry, error) {
 	jwtStrategy := jwt.NewJwtStrategy(conf)
-	servicesRegistry := container.NewServicesRegistry(jwtStrategy)
-	return servicesRegistry, nil
-}
-
-func InitializeControllerRegistry(db *gorm.DB, twilioApp twilio.ITwilioApp, conf *config.EnvConfig, serviceRegistry *container.ServicesRegistry) (*container.ControllerRegistry, error) {
-	iJwtStrategy := container.GetJwtService(serviceRegistry)
-	authDataSource, err := datasoruces.NewAuthDataSource(db, twilioApp, iJwtStrategy)
+	authDataSource, err := datasoruces.NewAuthDataSource(db, twilioApp, jwtStrategy)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +55,8 @@ func InitializeControllerRegistry(db *gorm.DB, twilioApp twilio.ITwilioApp, conf
 	return controllerRegistry, nil
 }
 
-func InitServer(controllerRegistry *container.ControllerRegistry, servicesRegistry *container.ServicesRegistry, configVars *config.EnvConfig, version string) (*types.Server, error) {
-	appApp := app.NewApp(controllerRegistry, servicesRegistry, configVars, version)
+func InitServer(controllerRegistry *container.ControllerRegistry, configVars *config.EnvConfig, version string) (*types.Server, error) {
+	appApp := app.NewApp(controllerRegistry, configVars, version)
 	typesServer, err := server.NewServer(appApp)
 	if err != nil {
 		return nil, err
