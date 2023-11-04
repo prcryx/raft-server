@@ -8,5 +8,7 @@ const (
 	otpVerificationFailed string = "otp verification failed"
 	failedToCreateUser    string = "failed to create user"
 	unauthorized          string = "unauthorized"
+	forbidden             string = "forbidden"
+	signingError             string = "signing error"
 	courruptedUserData    string = "corrupted user data"
 )

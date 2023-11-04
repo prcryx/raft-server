@@ -16,6 +16,10 @@ func InvalidBodyRequestException() AppError {
 	return newAppError(http.StatusBadRequest, invalidBodyRequest)
 }
 
+func UnacceptedSigningError() AppError {
+	return newAppError(http.StatusForbidden, signingError)
+}
+
 // func OtpServiceFailedException() error {
 // 	return errors.New(otpServiceFailed)
 // }
